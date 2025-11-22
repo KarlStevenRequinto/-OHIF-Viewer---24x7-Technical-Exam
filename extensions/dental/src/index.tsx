@@ -8,6 +8,8 @@ import { id } from './id';
 import getPanelModule from './getPanelModule';
 import getToolbarModule from './getToolbarModule';
 import getCommandsModule from './getCommandsModule';
+import getHangingProtocolModule from './getHangingProtocolModule';
+import getLayoutTemplateModule from './getLayoutTemplateModule';
 
 // Export components for external use
 export { default as DentalThemeToggle } from './components/DentalThemeToggle';
@@ -87,6 +89,8 @@ const dentalExtension: Types.Extensions.Extension = {
   getPanelModule,
   getToolbarModule,
   getCommandsModule,
+  getHangingProtocolModule,
+  getLayoutTemplateModule,
 
   /**
    * Get Customization Module

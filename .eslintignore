@@ -2,3 +2,4 @@ config/**
 docs/**
 img/**
 node_modules
+platform/app/src/pluginImports.js

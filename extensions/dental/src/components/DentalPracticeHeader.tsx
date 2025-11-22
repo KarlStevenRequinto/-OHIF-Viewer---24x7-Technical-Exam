@@ -21,19 +21,30 @@ interface DentalPracticeHeaderProps {
 }
 
 const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
-  practiceInfo = {
-    name: 'Dental Practice',
-    logo: undefined,
-    address: undefined,
-    phone: undefined,
-  },
-  patientInfo,
+  practiceInfo: practiceInfoProp,
+  patientInfo: patientInfoProp,
   selectedTeeth = [],
   onToothSelect,
   onToothDeselect,
   showToothSelector = true,
   className,
 }) => {
+  // Provide default values if props are null/undefined
+  const practiceInfo = practiceInfoProp || {
+    name: 'Dental Practice',
+    logo: undefined,
+    address: undefined,
+    phone: undefined,
+  };
+
+  const patientInfo = patientInfoProp || {
+    patientName: 'Unknown Patient',
+    patientId: 'N/A',
+    dateOfBirth: undefined,
+    gender: undefined,
+    age: undefined,
+    lastVisit: undefined,
+  };
   const [toothSelectorVisible, setToothSelectorVisible] = useState(false);
   const [numberingSystem, setNumberingSystem] = useState<ToothNumberingSystem>('universal');
 

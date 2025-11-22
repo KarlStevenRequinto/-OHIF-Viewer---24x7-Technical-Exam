@@ -6,6 +6,7 @@
 import React from 'react';
 import MeasurementsList from './components/MeasurementsList';
 import ExportButton from './components/ExportButton';
+import DentalPracticeHeader from './components/DentalPracticeHeader';
 import { useDentalStore } from './stores/useDentalStore';
 
 /**
@@ -105,11 +106,46 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
 };
 
 /**
+ * Dental Practice Info Panel Component
+ * Shows practice header with patient info and tooth selector
+ */
+const DentalPracticeInfoPanel = ({ servicesManager, commandsManager }) => {
+  const { selectedTeeth, selectTooth, deselectTooth, patientInfo, practiceInfo } =
+    useDentalStore();
+
+  return (
+    <div className="h-full overflow-y-auto bg-gray-50">
+      <DentalPracticeHeader
+        practiceInfo={practiceInfo}
+        patientInfo={patientInfo}
+        selectedTeeth={selectedTeeth}
+        onToothSelect={selectTooth}
+        onToothDeselect={deselectTooth}
+        showToothSelector={true}
+      />
+    </div>
+  );
+};
+
+/**
  * Get Panel Module
  * Exports panel configurations for OHIF
  */
 function getPanelModule({ servicesManager, commandsManager }) {
   return [
+    {
+      name: 'dentalPracticeInfo',
+      iconName: 'info-action',
+      iconLabel: 'Practice Info',
+      label: 'Practice Info',
+      component: props => (
+        <DentalPracticeInfoPanel
+          {...props}
+          servicesManager={servicesManager}
+          commandsManager={commandsManager}
+        />
+      ),
+    },
     {
       name: 'dentalMeasurements',
       iconName: 'list-bullets',
