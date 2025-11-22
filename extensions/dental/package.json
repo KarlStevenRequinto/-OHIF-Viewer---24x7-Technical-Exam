@@ -1,0 +1,30 @@
+{
+  "name": "@ohif/extension-dental",
+  "version": "3.12.0-beta.89",
+  "description": "OHIF Dental Extension - Specialized tools and UI for dental imaging workflows",
+  "author": "Dental Technical Exam",
+  "license": "MIT",
+  "main": "dist/ohif-extension-dental.umd.js",
+  "module": "src/index.tsx",
+  "engines": {
+    "node": ">=14",
+    "npm": ">=6",
+    "yarn": ">=1.16.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@ohif/core": "3.12.0-beta.89",
+    "@ohif/ui": "3.12.0-beta.89",
+    "@ohif/ui-next": "3.12.0-beta.89",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "dependencies": {
+    "classnames": "^2.5.1",
+    "prop-types": "^15.8.1",
+    "zustand": "^4.5.5"
+  }
+}

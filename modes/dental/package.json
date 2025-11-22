@@ -1,0 +1,24 @@
+{
+  "name": "@ohif/mode-dental",
+  "version": "3.12.0-beta.89",
+  "description": "OHIF Dental Mode - Specialized viewing mode for dental imaging workflows",
+  "author": "Dental Technical Exam",
+  "license": "MIT",
+  "main": "dist/ohif-mode-dental.umd.js",
+  "module": "src/index.ts",
+  "engines": {
+    "node": ">=14",
+    "npm": ">=6",
+    "yarn": ">=1.16.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@ohif/core": "3.12.0-beta.89",
+    "@ohif/extension-dental": "3.12.0-beta.89",
+    "@ohif/extension-default": "3.12.0-beta.89",
+    "@ohif/extension-cornerstone": "3.12.0-beta.89"
+  }
+}
