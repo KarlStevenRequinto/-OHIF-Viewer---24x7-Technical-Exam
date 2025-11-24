@@ -3,6 +3,7 @@
  * Provides dental-specific features including measurements, tooth selection, and theming
  */
 
+import React from 'react';
 import { Types } from '@ohif/core';
 import { id } from './id';
 import getPanelModule from './getPanelModule';
@@ -10,6 +11,7 @@ import getToolbarModule from './getToolbarModule';
 import getCommandsModule from './getCommandsModule';
 import getHangingProtocolModule from './getHangingProtocolModule';
 import getLayoutTemplateModule from './getLayoutTemplateModule';
+import DentalPracticeHeaderWrapper from './components/DentalPracticeHeaderWrapper';
 
 // Export components for external use
 export { default as DentalThemeToggle } from './components/DentalThemeToggle';
@@ -102,30 +104,7 @@ const dentalExtension: Types.Extensions.Extension = {
         name: 'dental-header',
         value: {
           id: 'dental-practice-header',
-          headerComponent: props => {
-            const DentalPracticeHeader = require('./components/DentalPracticeHeader').default;
-            const { useDentalStore } = require('./stores/useDentalStore');
-
-            const {
-              selectedTeeth,
-              selectTooth,
-              deselectTooth,
-              patientInfo,
-              practiceInfo,
-            } = useDentalStore();
-
-            return (
-              <DentalPracticeHeader
-                {...props}
-                practiceInfo={practiceInfo}
-                patientInfo={patientInfo}
-                selectedTeeth={selectedTeeth}
-                onToothSelect={selectTooth}
-                onToothDeselect={deselectTooth}
-                showToothSelector={true}
-              />
-            );
-          },
+          headerComponent: DentalPracticeHeaderWrapper,
         },
       },
     ];

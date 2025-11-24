@@ -9,6 +9,8 @@ import classNames from 'classnames';
 import { DentalPatientInfo, PracticeInfo, ToothNumber, ToothNumberingSystem } from '../types';
 import ToothSelector from './ToothSelector';
 import DentalThemeToggle from './DentalThemeToggle';
+import AuthModal from './AuthModal';
+import * as authState from '../services/authState';
 
 interface DentalPracticeHeaderProps {
   practiceInfo?: PracticeInfo;
@@ -54,6 +56,22 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
   };
   const [toothSelectorVisible, setToothSelectorVisible] = useState(false);
   const [numberingSystem, setNumberingSystem] = useState<ToothNumberingSystem>('universal');
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [user, setUser] = useState(authState.getCurrentUser());
+  const [isAuthenticated, setIsAuthenticated] = useState(authState.isAuthenticated());
+
+  // Subscribe to auth changes
+  useEffect(() => {
+    const unsubscribe = authState.subscribeToAuth((newUser) => {
+      setUser(newUser);
+      setIsAuthenticated(!!newUser);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleLogout = () => {
+    authState.logout();
+  };
 
   // Format patient age
   const getPatientAge = (): string | null => {
@@ -296,6 +314,60 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
             {/* Theme Toggle */}
             <DentalThemeToggle />
 
+            {/* Authentication UI */}
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                {/* User Info */}
+                <div
+                  className="px-3 py-1 rounded-lg text-sm"
+                  style={{
+                    backgroundColor: 'var(--dental-background)',
+                    color: 'var(--dental-text)',
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: 'var(--dental-primary)',
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="font-medium">{user?.fullName}</span>
+                  </div>
+                </div>
+
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-2 rounded-lg transition-colors duration-200 text-sm font-medium"
+                  style={{
+                    backgroundColor: 'var(--dental-primary)',
+                    color: 'white',
+                  }}
+                  title="Logout"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              /* Login Button */
+              <button
+                onClick={() => setAuthModalOpen(true)}
+                className="px-4 py-2 rounded-lg transition-colors duration-200 text-sm font-medium"
+                style={{
+                  backgroundColor: 'var(--dental-primary)',
+                  color: 'white',
+                }}
+                title="Login to save your data"
+              >
+                Login / Register
+              </button>
+            )}
+
             {/* Practice Info Button */}
             {practiceInfo.phone && (
               <button
@@ -366,6 +438,9 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
           </div>
         </div>
       )}
+
+      {/* Authentication Modal */}
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </div>
   );
 };

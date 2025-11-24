@@ -1,10 +1,12 @@
 /**
  * Dental Store - Zustand State Management
  * Manages dental-specific state including measurements, selected teeth, and theme
+ * Syncs with backend API for persistence
  */
 
 import { create } from 'zustand';
 import { DentalMeasurement, ToothNumber, MeasurementPreset, DentalPatientInfo, PracticeInfo } from '../types';
+import apiService from '../services/apiService';
 
 interface DentalStore {
   // Measurements
@@ -24,14 +26,19 @@ interface DentalStore {
   // Theme
   currentTheme: string;
 
-  // Actions - Measurements
-  addMeasurement: (measurement: DentalMeasurement) => void;
-  removeMeasurement: (measurementId: string) => void;
+  // Backend sync state
+  isSyncing: boolean;
+  lastSyncError: string | null;
+
+  // Actions - Measurements (with backend sync)
+  addMeasurement: (measurement: DentalMeasurement) => Promise<void>;
+  removeMeasurement: (measurementId: string) => Promise<void>;
   updateMeasurement: (measurementId: string, updates: Partial<DentalMeasurement>) => void;
   setSelectedMeasurementId: (measurementId: string | null) => void;
   setActiveMeasurementPreset: (preset: MeasurementPreset | null) => void;
   setMeasurementsPaletteOpen: (open: boolean) => void;
   clearMeasurements: () => void;
+  loadMeasurementsFromBackend: (patientId?: string, studyInstanceUID?: string) => Promise<void>;
 
   // Actions - Teeth
   selectTooth: (tooth: ToothNumber) => void;
@@ -43,8 +50,10 @@ interface DentalStore {
   setPatientInfo: (info: DentalPatientInfo | null) => void;
   setPracticeInfo: (info: PracticeInfo | null) => void;
 
-  // Actions - Theme
+  // Actions - Theme (with backend sync)
   setCurrentTheme: (theme: string) => void;
+  saveViewerStateToBackend: () => Promise<void>;
+  loadViewerStateFromBackend: (patientId?: string, studyInstanceUID?: string) => Promise<void>;
 
   // Actions - Utility
   reset: () => void;
@@ -60,19 +69,52 @@ const initialState = {
   patientInfo: null,
   practiceInfo: null,
   currentTheme: 'default',
+  isSyncing: false,
+  lastSyncError: null,
 };
 
 export const useDentalStore = create<DentalStore>((set, get) => ({
   ...initialState,
 
   // Measurements Actions
-  addMeasurement: (measurement: DentalMeasurement) => {
+  addMeasurement: async (measurement: DentalMeasurement) => {
+    // Add to local state immediately (optimistic update)
     set(state => ({
       measurements: [...state.measurements, measurement],
     }));
+
+    // Sync to backend if authenticated
+    if (apiService.isAuthenticated()) {
+      try {
+        set({ isSyncing: true, lastSyncError: null });
+
+        const patientInfo = get().patientInfo;
+        await apiService.createMeasurement({
+          id: measurement.id,
+          patientId: patientInfo?.patientId || 'unknown',
+          studyInstanceUID: patientInfo?.studyInstanceUID || 'unknown',
+          type: measurement.type,
+          label: measurement.label,
+          value: measurement.value,
+          unit: measurement.unit,
+          toothNumber: measurement.toothNumber,
+          timestamp: measurement.timestamp,
+          metadata: measurement.metadata,
+        });
+
+        console.log('✅ Measurement synced to backend:', measurement.id);
+      } catch (error: any) {
+        console.error('❌ Failed to sync measurement to backend:', error);
+        set({ lastSyncError: error.message || 'Sync failed' });
+        // Keep measurement in local state even if sync fails
+      } finally {
+        set({ isSyncing: false });
+      }
+    }
   },
 
-  removeMeasurement: (measurementId: string) => {
+  removeMeasurement: async (measurementId: string) => {
+    // Remove from local state immediately (optimistic update)
     set(state => ({
       measurements: state.measurements.filter(m => m.id !== measurementId),
       selectedMeasurementId:
@@ -80,6 +122,54 @@ export const useDentalStore = create<DentalStore>((set, get) => ({
           ? null
           : state.selectedMeasurementId,
     }));
+
+    // Sync to backend if authenticated
+    if (apiService.isAuthenticated()) {
+      try {
+        set({ isSyncing: true, lastSyncError: null });
+        await apiService.deleteMeasurement(measurementId);
+        console.log('✅ Measurement deleted from backend:', measurementId);
+      } catch (error: any) {
+        console.error('❌ Failed to delete measurement from backend:', error);
+        set({ lastSyncError: error.message || 'Delete failed' });
+      } finally {
+        set({ isSyncing: false });
+      }
+    }
+  },
+
+  loadMeasurementsFromBackend: async (patientId?: string, studyInstanceUID?: string) => {
+    if (!apiService.isAuthenticated()) {
+      console.warn('⚠️ Not authenticated, skipping measurement load');
+      return;
+    }
+
+    try {
+      set({ isSyncing: true, lastSyncError: null });
+
+      const response = await apiService.getMeasurements(patientId, studyInstanceUID);
+
+      if (response.success && response.data) {
+        const backendMeasurements = response.data.measurements.map((m: any) => ({
+          id: m.id,
+          type: m.type,
+          label: m.label,
+          value: m.value,
+          unit: m.unit,
+          toothNumber: m.toothNumber,
+          timestamp: m.timestamp,
+          metadata: m.metadata,
+        }));
+
+        set({ measurements: backendMeasurements });
+        console.log(`✅ Loaded ${backendMeasurements.length} measurements from backend`);
+      }
+    } catch (error: any) {
+      console.error('❌ Failed to load measurements from backend:', error);
+      set({ lastSyncError: error.message || 'Load failed' });
+    } finally {
+      set({ isSyncing: false });
+    }
   },
 
   updateMeasurement: (measurementId: string, updates: Partial<DentalMeasurement>) => {
@@ -156,6 +246,72 @@ export const useDentalStore = create<DentalStore>((set, get) => ({
   // Theme Actions
   setCurrentTheme: (theme: string) => {
     set({ currentTheme: theme });
+    // Auto-save viewer state when theme changes
+    const store = get();
+    if (apiService.isAuthenticated()) {
+      store.saveViewerStateToBackend().catch(err => {
+        console.error('Failed to save theme change:', err);
+      });
+    }
+  },
+
+  // Viewer State Backend Sync
+  saveViewerStateToBackend: async () => {
+    if (!apiService.isAuthenticated()) {
+      console.warn('⚠️ Not authenticated, skipping viewer state save');
+      return;
+    }
+
+    try {
+      set({ isSyncing: true, lastSyncError: null });
+
+      const state = get();
+      const patientInfo = state.patientInfo;
+
+      await apiService.saveViewerState({
+        patientId: patientInfo?.patientId,
+        studyInstanceUID: patientInfo?.studyInstanceUID,
+        theme: state.currentTheme,
+        selectedTeeth: state.selectedTeeth,
+        viewportSettings: null, // Can be extended later
+      });
+
+      console.log('✅ Viewer state saved to backend');
+    } catch (error: any) {
+      console.error('❌ Failed to save viewer state to backend:', error);
+      set({ lastSyncError: error.message || 'Save viewer state failed' });
+    } finally {
+      set({ isSyncing: false });
+    }
+  },
+
+  loadViewerStateFromBackend: async (patientId?: string, studyInstanceUID?: string) => {
+    if (!apiService.isAuthenticated()) {
+      console.warn('⚠️ Not authenticated, skipping viewer state load');
+      return;
+    }
+
+    try {
+      set({ isSyncing: true, lastSyncError: null });
+
+      const response = await apiService.getViewerState(patientId, studyInstanceUID);
+
+      if (response.success && response.data?.state) {
+        const state = response.data.state;
+
+        set({
+          currentTheme: state.theme || 'default',
+          selectedTeeth: state.selectedTeeth || [],
+        });
+
+        console.log('✅ Viewer state loaded from backend');
+      }
+    } catch (error: any) {
+      console.error('❌ Failed to load viewer state from backend:', error);
+      set({ lastSyncError: error.message || 'Load viewer state failed' });
+    } finally {
+      set({ isSyncing: false });
+    }
   },
 
   // Utility Actions
