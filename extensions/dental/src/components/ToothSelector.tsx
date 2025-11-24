@@ -64,26 +64,35 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
         onClick={() => handleToothClick(tooth)}
         onMouseEnter={() => setHoveredTooth(tooth)}
         onMouseLeave={() => setHoveredTooth(null)}
-        className={classNames(
-          'relative w-10 h-14 rounded-lg border-2 transition-all duration-200',
-          'flex flex-col items-center justify-center text-xs font-medium',
-          selected && 'border-blue-500 bg-blue-500 text-white shadow-lg',
-          !selected && hovered && 'border-blue-300 bg-blue-50 scale-105',
-          !selected && !hovered && 'border-gray-300 bg-white text-gray-700',
-          'hover:shadow-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400'
-        )}
+        className="relative w-10 h-14 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center text-xs font-medium hover:shadow-md cursor-pointer focus:outline-none focus:ring-2"
+        style={{
+          backgroundColor: selected
+            ? 'var(--dental-primary)'
+            : hovered
+            ? 'var(--dental-background)'
+            : 'var(--dental-surface)',
+          borderColor: selected
+            ? 'var(--dental-primary)'
+            : hovered
+            ? 'var(--dental-secondary)'
+            : 'var(--dental-text)',
+          borderWidth: selected ? '2px' : '1px',
+          color: selected ? 'white' : 'var(--dental-text)',
+          transform: hovered && !selected ? 'scale(1.05)' : 'scale(1)',
+        }}
         title={`${formatToothNumber(tooth, numberingSystem)} - ${
           isUpperTooth(tooth) ? 'Upper' : 'Lower'
         } ${tooth.quadrant === 1 || tooth.quadrant === 4 ? 'Right' : 'Left'}`}
       >
         {/* Tooth icon (simplified) */}
         <svg
-          className={classNames(
-            'w-5 h-5 mb-1',
-            selected ? 'text-white' : 'text-gray-400'
-          )}
+          className="w-5 h-5 mb-1"
           fill="currentColor"
           viewBox="0 0 24 24"
+          style={{
+            color: selected ? 'white' : 'var(--dental-text)',
+            opacity: selected ? 1 : 0.6,
+          }}
         >
           <path d="M12 2C10 2 8.5 3.5 8 5.5C7.5 7.5 7 9 7 11C7 14 8 17 10 19C11 20 12 20 12 20C12 20 13 20 14 19C16 17 17 14 17 11C17 9 16.5 7.5 16 5.5C15.5 3.5 14 2 12 2Z" />
         </svg>
@@ -97,18 +106,41 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
   };
 
   return (
-    <div className={classNames('bg-white rounded-lg shadow-sm p-4', className)}>
+    <div
+      className={classNames('rounded-lg shadow-sm p-4', className)}
+      style={{
+        backgroundColor: 'var(--dental-surface)',
+      }}
+    >
       {/* Header with Numbering System Toggle */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-gray-700">Tooth Selector</h3>
+        <h3
+          className="text-sm font-semibold"
+          style={{
+            color: 'var(--dental-text)',
+            fontFamily: 'var(--dental-font-family)',
+          }}
+        >
+          Tooth Selector
+        </h3>
         <div className="flex items-center gap-2">
-          <label className="text-xs text-gray-600">Notation:</label>
+          <label
+            className="text-xs"
+            style={{ color: 'var(--dental-text)', opacity: 0.8 }}
+          >
+            Notation:
+          </label>
           <select
             value={numberingSystem}
             onChange={e =>
               onNumberingSystemChange?.(e.target.value as ToothNumberingSystem)
             }
-            className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="text-xs border rounded px-2 py-1 focus:outline-none focus:ring-2"
+            style={{
+              borderColor: 'var(--dental-primary)',
+              backgroundColor: 'var(--dental-background)',
+              color: 'var(--dental-text)',
+            }}
           >
             <option value="universal">Universal (1-32)</option>
             <option value="fdi">FDI (11-48)</option>
@@ -119,23 +151,42 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
       {/* Tooth Chart */}
       <div className="space-y-4">
         {/* Upper Arch */}
-        <div className="border-b-2 border-gray-300 pb-4">
-          <div className="text-xs text-center text-gray-500 mb-2 font-medium">
+        <div
+          className="border-b-2 pb-4"
+          style={{ borderColor: 'var(--dental-text)', opacity: 0.3 }}
+        >
+          <div
+            className="text-xs text-center mb-2 font-medium"
+            style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+          >
             UPPER ARCH
           </div>
           <div className="flex justify-center gap-6">
             {/* Upper Right (Q1) */}
             <div className="flex flex-col items-center">
-              <div className="text-[10px] text-gray-400 mb-1">UR</div>
+              <div
+                className="text-[10px] mb-1"
+                style={{ color: 'var(--dental-text)', opacity: 0.5 }}
+              >
+                UR
+              </div>
               <div className="flex gap-1">{quadrant1.map(renderTooth)}</div>
             </div>
 
             {/* Midline */}
-            <div className="w-px bg-gray-400" />
+            <div
+              className="w-px"
+              style={{ backgroundColor: 'var(--dental-text)', opacity: 0.3 }}
+            />
 
             {/* Upper Left (Q2) */}
             <div className="flex flex-col items-center">
-              <div className="text-[10px] text-gray-400 mb-1">UL</div>
+              <div
+                className="text-[10px] mb-1"
+                style={{ color: 'var(--dental-text)', opacity: 0.5 }}
+              >
+                UL
+              </div>
               <div className="flex gap-1">{quadrant2.map(renderTooth)}</div>
             </div>
           </div>
@@ -143,23 +194,39 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
 
         {/* Lower Arch */}
         <div>
-          <div className="text-xs text-center text-gray-500 mb-2 font-medium">
+          <div
+            className="text-xs text-center mb-2 font-medium"
+            style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+          >
             LOWER ARCH
           </div>
           <div className="flex justify-center gap-6">
             {/* Lower Right (Q4) */}
             <div className="flex flex-col items-center">
               <div className="flex gap-1">{quadrant4.map(renderTooth)}</div>
-              <div className="text-[10px] text-gray-400 mt-1">LR</div>
+              <div
+                className="text-[10px] mt-1"
+                style={{ color: 'var(--dental-text)', opacity: 0.5 }}
+              >
+                LR
+              </div>
             </div>
 
             {/* Midline */}
-            <div className="w-px bg-gray-400" />
+            <div
+              className="w-px"
+              style={{ backgroundColor: 'var(--dental-text)', opacity: 0.3 }}
+            />
 
             {/* Lower Left (Q3) */}
             <div className="flex flex-col items-center">
               <div className="flex gap-1">{quadrant3.map(renderTooth)}</div>
-              <div className="text-[10px] text-gray-400 mt-1">LL</div>
+              <div
+                className="text-[10px] mt-1"
+                style={{ color: 'var(--dental-text)', opacity: 0.5 }}
+              >
+                LL
+              </div>
             </div>
           </div>
         </div>
@@ -167,20 +234,32 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
 
       {/* Selected Teeth Display */}
       {selectedTeeth.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="text-xs font-medium text-gray-600 mb-2">
+        <div
+          className="mt-4 pt-4 border-t"
+          style={{ borderColor: 'var(--dental-text)', opacity: 0.2 }}
+        >
+          <div
+            className="text-xs font-medium mb-2"
+            style={{ color: 'var(--dental-text)' }}
+          >
             Selected Teeth ({selectedTeeth.length}):
           </div>
           <div className="flex flex-wrap gap-2">
             {selectedTeeth.map(tooth => (
               <span
                 key={tooth.universal}
-                className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
+                style={{
+                  backgroundColor: 'var(--dental-primary)',
+                  color: 'white',
+                  opacity: 0.9,
+                }}
               >
                 {formatToothNumber(tooth, numberingSystem)}
                 <button
                   onClick={() => onToothDeselect?.(tooth)}
-                  className="hover:text-blue-900 focus:outline-none"
+                  className="hover:opacity-75 focus:outline-none"
+                  style={{ color: 'white' }}
                   title="Deselect"
                 >
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -199,20 +278,38 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
 
       {/* Hovered Tooth Info */}
       {hoveredTooth && (
-        <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-          <div className="font-medium text-blue-900">
+        <div
+          className="mt-3 p-2 border rounded text-xs"
+          style={{
+            backgroundColor: 'var(--dental-background)',
+            borderColor: 'var(--dental-primary)',
+          }}
+        >
+          <div
+            className="font-medium"
+            style={{ color: 'var(--dental-primary)' }}
+          >
             Tooth {formatToothNumber(hoveredTooth, numberingSystem)}
           </div>
-          <div className="text-blue-700 mt-1">
+          <div
+            className="mt-1"
+            style={{ color: 'var(--dental-text)' }}
+          >
             {getQuadrantName(hoveredTooth.quadrant)} • Position {hoveredTooth.position}
           </div>
           {numberingSystem === 'universal' && (
-            <div className="text-blue-600 text-[10px] mt-1">
+            <div
+              className="text-[10px] mt-1"
+              style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+            >
               FDI: {hoveredTooth.fdi}
             </div>
           )}
           {numberingSystem === 'fdi' && (
-            <div className="text-blue-600 text-[10px] mt-1">
+            <div
+              className="text-[10px] mt-1"
+              style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+            >
               Universal: #{hoveredTooth.universal}
             </div>
           )}

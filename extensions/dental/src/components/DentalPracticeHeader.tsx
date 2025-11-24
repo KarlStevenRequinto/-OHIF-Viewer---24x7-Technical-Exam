@@ -20,6 +20,13 @@ interface DentalPracticeHeaderProps {
   className?: string;
 }
 
+// Helper function to create rgba from CSS variable
+const hexToRgba = (cssVar: string, opacity: number): string => {
+  // For CSS variables, we'll use a fallback approach
+  // Since we can't parse CSS vars in JS, we'll use a simplified approach
+  return `rgba(43, 122, 155, ${opacity})`; // Fallback color
+};
+
 const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
   practiceInfo: practiceInfoProp,
   patientInfo: patientInfoProp,
@@ -76,9 +83,13 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
   return (
     <div
       className={classNames(
-        'bg-white border-b-2 border-gray-200 shadow-sm',
+        'border-b-2 shadow-sm',
         className
       )}
+      style={{
+        backgroundColor: 'var(--dental-surface)',
+        borderColor: 'var(--dental-primary)',
+      }}
     >
       {/* Main Header */}
       <div className="px-6 py-3">
@@ -92,16 +103,36 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
                 className="h-12 w-auto object-contain"
               />
             ) : (
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-lg shadow-md">
+              <div
+                className="flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-lg shadow-md"
+                style={{
+                  background: `linear-gradient(135deg, var(--dental-primary), var(--dental-secondary))`,
+                }}
+              >
                 🦷
               </div>
             )}
             <div>
-              <h1 className="text-xl font-bold text-gray-800">
+              <h1
+                className="text-xl font-bold"
+                style={{
+                  color: 'var(--dental-text)',
+                  fontFamily: 'var(--dental-font-family)',
+                  fontSize: 'var(--dental-header-size)',
+                }}
+              >
                 {practiceInfo.name}
               </h1>
               {practiceInfo.address && (
-                <p className="text-xs text-gray-500">{practiceInfo.address}</p>
+                <p
+                  className="text-xs"
+                  style={{
+                    color: 'var(--dental-text)',
+                    opacity: 0.7,
+                  }}
+                >
+                  {practiceInfo.address}
+                </p>
               )}
             </div>
           </div>
@@ -109,38 +140,73 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
           {/* Center: Patient Information */}
           {patientInfo && (
             <div className="flex-1 mx-8">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+              <div
+                className="rounded-lg p-4 border"
+                style={{
+                  backgroundColor: 'var(--dental-background)',
+                  borderColor: 'var(--dental-primary)',
+                  borderWidth: '1px',
+                  opacity: 0.95,
+                }}
+              >
                 <div className="grid grid-cols-3 gap-4">
                   {/* Patient Name */}
                   <div>
-                    <div className="text-xs font-medium text-blue-700 mb-1">
+                    <div
+                      className="text-xs font-medium mb-1"
+                      style={{ color: 'var(--dental-primary)' }}
+                    >
                       PATIENT
                     </div>
-                    <div className="font-bold text-gray-900 truncate" title={patientInfo.patientName}>
+                    <div
+                      className="font-bold truncate"
+                      style={{ color: 'var(--dental-text)' }}
+                      title={patientInfo.patientName}
+                    >
                       {patientInfo.patientName}
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div
+                      className="text-xs"
+                      style={{
+                        color: 'var(--dental-text)',
+                        opacity: 0.7,
+                      }}
+                    >
                       ID: {patientInfo.patientId}
                     </div>
                   </div>
 
                   {/* Demographics */}
                   <div>
-                    <div className="text-xs font-medium text-blue-700 mb-1">
+                    <div
+                      className="text-xs font-medium mb-1"
+                      style={{ color: 'var(--dental-primary)' }}
+                    >
                       DEMOGRAPHICS
                     </div>
                     <div className="flex gap-3 text-sm">
                       {getPatientAge() && (
-                        <span className="text-gray-700">{getPatientAge()}</span>
+                        <span style={{ color: 'var(--dental-text)' }}>
+                          {getPatientAge()}
+                        </span>
                       )}
                       {patientInfo.gender && (
-                        <span className="text-gray-700 capitalize">
+                        <span
+                          className="capitalize"
+                          style={{ color: 'var(--dental-text)' }}
+                        >
                           {patientInfo.gender}
                         </span>
                       )}
                     </div>
                     {patientInfo.dateOfBirth && (
-                      <div className="text-xs text-gray-600">
+                      <div
+                        className="text-xs"
+                        style={{
+                          color: 'var(--dental-text)',
+                          opacity: 0.7,
+                        }}
+                      >
                         DOB: {formatDate(patientInfo.dateOfBirth)}
                       </div>
                     )}
@@ -148,10 +214,16 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
 
                   {/* Last Visit */}
                   <div>
-                    <div className="text-xs font-medium text-blue-700 mb-1">
+                    <div
+                      className="text-xs font-medium mb-1"
+                      style={{ color: 'var(--dental-primary)' }}
+                    >
                       LAST VISIT
                     </div>
-                    <div className="text-sm text-gray-700">
+                    <div
+                      className="text-sm"
+                      style={{ color: 'var(--dental-text)' }}
+                    >
                       {formatDate(patientInfo.lastVisit)}
                     </div>
                   </div>
@@ -166,13 +238,14 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
             {showToothSelector && (
               <button
                 onClick={() => setToothSelectorVisible(!toothSelectorVisible)}
-                className={classNames(
-                  'flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200',
-                  'focus:outline-none focus:ring-2 focus:ring-blue-500',
-                  toothSelectorVisible
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                )}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 text-white"
+                style={{
+                  backgroundColor: toothSelectorVisible
+                    ? 'var(--dental-primary)'
+                    : 'var(--dental-text)',
+                  opacity: toothSelectorVisible ? 1 : 0.6,
+                  borderColor: 'var(--dental-primary)',
+                }}
                 title="Toggle Tooth Selector"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -192,7 +265,14 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
             {/* Practice Info Button */}
             {practiceInfo.phone && (
               <button
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2"
+                style={{
+                  backgroundColor: 'var(--dental-background)',
+                  color: 'var(--dental-text)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--dental-primary)',
+                }}
                 title="Contact Practice"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -207,7 +287,13 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
 
       {/* Tooth Selector Panel (Collapsible) */}
       {showToothSelector && toothSelectorVisible && (
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div
+          className="px-6 py-4 border-t"
+          style={{
+            backgroundColor: 'var(--dental-background)',
+            borderColor: 'var(--dental-primary)',
+          }}
+        >
           <ToothSelector
             selectedTeeth={selectedTeeth}
             onToothSelect={onToothSelect}
@@ -221,15 +307,25 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
 
       {/* Quick Stats Bar (optional) */}
       {selectedTeeth.length > 0 && !toothSelectorVisible && (
-        <div className="px-6 py-2 bg-blue-50 border-t border-blue-100">
+        <div
+          className="px-6 py-2 border-t"
+          style={{
+            backgroundColor: 'var(--dental-background)',
+            borderColor: 'var(--dental-primary)',
+          }}
+        >
           <div className="flex items-center justify-between text-xs">
-            <span className="text-blue-700 font-medium">
+            <span
+              className="font-medium"
+              style={{ color: 'var(--dental-primary)' }}
+            >
               {selectedTeeth.length} tooth{selectedTeeth.length !== 1 ? 'es' : ''}{' '}
               selected
             </span>
             <button
               onClick={() => setToothSelectorVisible(true)}
-              className="text-blue-600 hover:text-blue-800 underline"
+              className="underline"
+              style={{ color: 'var(--dental-primary)' }}
             >
               View/Edit Selection
             </button>
