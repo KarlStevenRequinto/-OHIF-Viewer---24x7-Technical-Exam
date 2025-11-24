@@ -104,33 +104,88 @@ const mode = {
 
     // Hide the default OHIF header and inject Dental Practice Header
     const injectDentalHeader = async () => {
+      // Check if already injected
+      if ((window as any).__dentalHeaderRoot) {
+        console.log('⏭️ Dental header already injected, skipping');
+        return;
+      }
+
       // Import React and ReactDOM
       const React = await import('react');
       const ReactDOM = await import('react-dom/client');
 
-      // Import dental components
-      const { default: DentalPracticeHeader } = await import('@ohif/extension-dental');
-      const { useDentalStore } = await import('@ohif/extension-dental');
+      // Import dental components - use named exports
+      const dentalModule = await import('@ohif/extension-dental');
+      const DentalPracticeHeader = dentalModule.DentalPracticeHeader;
+      const useDentalStore = dentalModule.useDentalStore;
 
-      // Find the header element
-      const headerContainer = document.querySelector('header');
+      console.log('Dental module imported:', {
+        DentalPracticeHeader: typeof DentalPracticeHeader,
+        useDentalStore: typeof useDentalStore,
+      });
+
+      // Find the ACTUAL header/nav element - be more specific
+      // Look for elements with specific structure, not just any element
+      const possibleSelectors = [
+        'nav[class*="NavBar"]',
+        'div[class*="Header"]',
+        'header',
+        '[role="banner"]',
+        // Look for the actual OHIF nav structure
+        'nav > div', // NavBar > content div
+        'div[class*="h-\\[48px\\]"]', // The 48px height div from Header.tsx
+      ];
+
+      let headerContainer = null;
+      for (const selector of possibleSelectors) {
+        const element = document.querySelector(selector);
+        if (element && element.tagName !== 'NOSCRIPT') {
+          headerContainer = element;
+          console.log(`✅ Found header with selector: ${selector}`, element);
+          break;
+        }
+      }
+
+      // Fallback: Find the first meaningful child of body (skip noscript)
       if (!headerContainer) {
-        console.warn('Header container not found');
+        const bodyChildren = Array.from(document.body.children);
+        headerContainer = bodyChildren.find(
+          el => el.tagName !== 'NOSCRIPT' && el.tagName !== 'SCRIPT'
+        ) as HTMLElement;
+        console.log('Using first body child:', headerContainer?.tagName);
+      }
+
+      if (!headerContainer) {
+        console.warn('❌ Header container not found - tried all selectors');
         return;
       }
 
-      // Clear existing header content and inject dental header
-      headerContainer.innerHTML = '';
-      headerContainer.style.cssText = 'display: block !important; background: white;';
+      console.log('✅ Found header container:', headerContainer.tagName, headerContainer.className);
+
+      // Create a NEW div to inject into instead of clearing existing content
+      const dentalHeaderDiv = document.createElement('div');
+      dentalHeaderDiv.id = 'dental-practice-header';
+      dentalHeaderDiv.style.cssText = 'width: 100%; background: white; z-index: 1000;';
+
+      // Insert at the top of the page
+      if (headerContainer.parentElement) {
+        headerContainer.parentElement.insertBefore(dentalHeaderDiv, headerContainer);
+        // Hide the original header
+        (headerContainer as HTMLElement).style.display = 'none';
+      } else {
+        // Fallback: prepend to body
+        document.body.insertBefore(dentalHeaderDiv, document.body.firstChild);
+      }
 
       // Create root and render dental header
-      const root = ReactDOM.createRoot(headerContainer);
+      const root = ReactDOM.default.createRoot(dentalHeaderDiv);
+      const createElement = React.default.createElement;
 
       const DentalHeaderWrapper = () => {
         const { selectedTeeth, selectTooth, deselectTooth, patientInfo, practiceInfo } =
           useDentalStore();
 
-        return React.createElement(DentalPracticeHeader, {
+        return createElement(DentalPracticeHeader, {
           practiceInfo,
           patientInfo,
           selectedTeeth,
@@ -140,14 +195,18 @@ const mode = {
         });
       };
 
-      root.render(React.createElement(DentalHeaderWrapper));
+      root.render(createElement(DentalHeaderWrapper));
 
       // Store root for cleanup
       (window as any).__dentalHeaderRoot = root;
+      (window as any).__dentalHeaderElement = dentalHeaderDiv;
+      (window as any).__originalHeader = headerContainer;
+
+      console.log('✅ Dental Practice Header injected successfully!');
     };
 
-    // Execute after a short delay to ensure DOM is ready
-    setTimeout(injectDentalHeader, 500);
+    // Execute after a delay to ensure DOM is ready
+    setTimeout(injectDentalHeader, 1500);
 
     // Initialize dental-specific services
     const { measurementService, hangingProtocolService } = servicesManager.services;
@@ -228,9 +287,22 @@ const mode = {
 
     // Cleanup dental header
     const root = (window as any).__dentalHeaderRoot;
+    const dentalHeaderElement = (window as any).__dentalHeaderElement;
+    const originalHeader = (window as any).__originalHeader;
+
     if (root) {
       root.unmount();
       delete (window as any).__dentalHeaderRoot;
+    }
+
+    if (dentalHeaderElement && dentalHeaderElement.parentElement) {
+      dentalHeaderElement.parentElement.removeChild(dentalHeaderElement);
+      delete (window as any).__dentalHeaderElement;
+    }
+
+    if (originalHeader) {
+      (originalHeader as HTMLElement).style.display = '';
+      delete (window as any).__originalHeader;
     }
 
     // Clean up event listeners
