@@ -34,7 +34,19 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
   multiSelect = true,
 }) => {
   const [hoveredTooth, setHoveredTooth] = useState<ToothNumber | null>(null);
+  const [lastViewedTooth, setLastViewedTooth] = useState<ToothNumber | null>(null);
   const allTeeth = getAllTeeth();
+
+  // Update last viewed tooth when hovering
+  const handleToothHover = (tooth: ToothNumber | null) => {
+    setHoveredTooth(tooth);
+    if (tooth) {
+      setLastViewedTooth(tooth);
+    }
+  };
+
+  // Get the tooth to display info for (hovered, or last viewed, or first selected)
+  const displayTooth = hoveredTooth || lastViewedTooth || (selectedTeeth.length > 0 ? selectedTeeth[0] : null);
 
   const isToothSelected = (tooth: ToothNumber): boolean => {
     return selectedTeeth.some(t => t.universal === tooth.universal);
@@ -62,8 +74,8 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
       <button
         key={tooth.universal}
         onClick={() => handleToothClick(tooth)}
-        onMouseEnter={() => setHoveredTooth(tooth)}
-        onMouseLeave={() => setHoveredTooth(null)}
+        onMouseEnter={() => handleToothHover(tooth)}
+        onMouseLeave={() => handleToothHover(null)}
         className="relative w-10 h-14 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center text-xs font-medium hover:shadow-md cursor-pointer focus:outline-none focus:ring-2"
         style={{
           backgroundColor: selected
@@ -90,15 +102,15 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
           fill="currentColor"
           viewBox="0 0 24 24"
           style={{
-            color: selected ? 'white' : 'var(--dental-text)',
-            opacity: selected ? 1 : 0.6,
+            color: selected ? 'white' : 'var(--dental-primary)',
+            opacity: 1,
           }}
         >
           <path d="M12 2C10 2 8.5 3.5 8 5.5C7.5 7.5 7 9 7 11C7 14 8 17 10 19C11 20 12 20 12 20C12 20 13 20 14 19C16 17 17 14 17 11C17 9 16.5 7.5 16 5.5C15.5 3.5 14 2 12 2Z" />
         </svg>
 
         {/* Number display */}
-        <span className="text-[10px] font-bold">
+        <span className="text-[10px] font-bold" style={{ opacity: 1 }}>
           {numberingSystem === 'universal' ? tooth.universal : tooth.fdi}
         </span>
       </button>
@@ -151,10 +163,7 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
       {/* Tooth Chart */}
       <div className="space-y-4">
         {/* Upper Arch */}
-        <div
-          className="border-b-2 pb-4"
-          style={{ borderColor: 'var(--dental-text)', opacity: 0.3 }}
-        >
+        <div className="border-b-2 pb-4" style={{ borderColor: 'var(--dental-text)' }}>
           <div
             className="text-xs text-center mb-2 font-medium"
             style={{ color: 'var(--dental-text)', opacity: 0.7 }}
@@ -276,45 +285,55 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
         </div>
       )}
 
-      {/* Hovered Tooth Info */}
-      {hoveredTooth && (
-        <div
-          className="mt-3 p-2 border rounded text-xs"
-          style={{
-            backgroundColor: 'var(--dental-background)',
-            borderColor: 'var(--dental-primary)',
-          }}
-        >
-          <div
-            className="font-medium"
-            style={{ color: 'var(--dental-primary)' }}
-          >
-            Tooth {formatToothNumber(hoveredTooth, numberingSystem)}
-          </div>
-          <div
-            className="mt-1"
-            style={{ color: 'var(--dental-text)' }}
-          >
-            {getQuadrantName(hoveredTooth.quadrant)} • Position {hoveredTooth.position}
-          </div>
-          {numberingSystem === 'universal' && (
+      {/* Tooth Info - Always Visible */}
+      <div
+        className="mt-3 p-2 border rounded text-xs"
+        style={{
+          backgroundColor: 'var(--dental-background)',
+          borderColor: 'var(--dental-primary)',
+          minHeight: '80px',
+        }}
+      >
+        {displayTooth ? (
+          <>
             <div
-              className="text-[10px] mt-1"
-              style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+              className="font-medium"
+              style={{ color: 'var(--dental-primary)' }}
             >
-              FDI: {hoveredTooth.fdi}
+              Tooth {formatToothNumber(displayTooth, numberingSystem)}
             </div>
-          )}
-          {numberingSystem === 'fdi' && (
             <div
-              className="text-[10px] mt-1"
-              style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+              className="mt-1"
+              style={{ color: 'var(--dental-text)' }}
             >
-              Universal: #{hoveredTooth.universal}
+              {getQuadrantName(displayTooth.quadrant)} • Position {displayTooth.position}
             </div>
-          )}
-        </div>
-      )}
+            {numberingSystem === 'universal' && (
+              <div
+                className="text-[10px] mt-1"
+                style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+              >
+                FDI: {displayTooth.fdi}
+              </div>
+            )}
+            {numberingSystem === 'fdi' && (
+              <div
+                className="text-[10px] mt-1"
+                style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+              >
+                Universal: #{displayTooth.universal}
+              </div>
+            )}
+          </>
+        ) : (
+          <div
+            className="flex items-center justify-center h-full"
+            style={{ color: 'var(--dental-text)', opacity: 0.5 }}
+          >
+            Hover over a tooth to view details
+          </div>
+        )}
+      </div>
     </div>
   );
 };

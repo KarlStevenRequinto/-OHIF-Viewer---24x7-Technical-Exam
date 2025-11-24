@@ -238,13 +238,14 @@ const DentalPracticeHeader: React.FC<DentalPracticeHeaderProps> = ({
             {showToothSelector && (
               <button
                 onClick={() => setToothSelectorVisible(!toothSelectorVisible)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 text-white"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 border"
                 style={{
                   backgroundColor: toothSelectorVisible
                     ? 'var(--dental-primary)'
-                    : 'var(--dental-text)',
-                  opacity: toothSelectorVisible ? 1 : 0.6,
+                    : 'var(--dental-background)',
+                  color: toothSelectorVisible ? 'white' : 'var(--dental-text)',
                   borderColor: 'var(--dental-primary)',
+                  borderWidth: '2px',
                 }}
                 title="Toggle Tooth Selector"
               >

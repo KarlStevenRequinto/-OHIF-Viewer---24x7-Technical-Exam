@@ -102,6 +102,21 @@ const mode = {
   onModeEnter: ({ servicesManager, extensionManager, commandsManager }) => {
     console.log('🦷 Entering Dental Mode');
 
+    // Apply saved theme or default dental theme
+    const applySavedTheme = () => {
+      try {
+        const { loadThemePreference, getTheme, applyTheme } = require('@ohif/extension-dental');
+        const savedThemeName = loadThemePreference() || 'dental';
+        const theme = getTheme(savedThemeName);
+        applyTheme(theme);
+        console.log(`Applied saved theme: ${savedThemeName}`);
+      } catch (error) {
+        console.warn('Could not apply saved theme:', error);
+      }
+    };
+
+    applySavedTheme();
+
     // Hide the default OHIF header and inject Dental Practice Header
     const injectDentalHeader = async () => {
       // Check if already injected
