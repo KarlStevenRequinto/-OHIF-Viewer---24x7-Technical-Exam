@@ -53,9 +53,15 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--dental-background)' }}>
       {/* Export Button at the Top */}
-      <div className="p-3 border-b border-gray-200 bg-white">
+      <div
+        className="p-3 border-b"
+        style={{
+          backgroundColor: 'var(--dental-surface)',
+          borderColor: 'var(--dental-primary)'
+        }}
+      >
         <ExportButton
           measurements={measurements}
           patientInfo={patientInfo}
@@ -78,8 +84,17 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
 
       {/* Summary Footer */}
       {measurements.length > 0 && (
-        <div className="p-3 border-t border-gray-200 bg-gray-50">
-          <div className="text-xs text-gray-600 flex items-center justify-between">
+        <div
+          className="p-3 border-t"
+          style={{
+            backgroundColor: 'var(--dental-surface)',
+            borderColor: 'var(--dental-primary)'
+          }}
+        >
+          <div
+            className="text-xs flex items-center justify-between"
+            style={{ color: 'var(--dental-text)' }}
+          >
             <span>
               Total: <strong>{measurements.length}</strong> measurement
               {measurements.length !== 1 ? 's' : ''}
@@ -94,7 +109,8 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
                   useDentalStore.getState().clearMeasurements();
                 }
               }}
-              className="text-red-600 hover:text-red-800 underline text-xs"
+              className="underline text-xs hover:opacity-80"
+              style={{ color: 'var(--dental-accent)' }}
             >
               Clear All
             </button>
@@ -135,7 +151,7 @@ function getPanelModule({ servicesManager, commandsManager }) {
   return [
     {
       name: 'dentalPracticeInfo',
-      iconName: 'info-action',
+      iconName: 'tab-studies',
       iconLabel: 'Practice Info',
       label: 'Practice Info',
       component: props => (
@@ -148,7 +164,7 @@ function getPanelModule({ servicesManager, commandsManager }) {
     },
     {
       name: 'dentalMeasurements',
-      iconName: 'list-bullets',
+      iconName: 'tab-studies',
       iconLabel: 'Dental Measurements',
       label: 'Dental Measurements',
       component: props => (

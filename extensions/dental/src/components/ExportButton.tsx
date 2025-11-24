@@ -72,20 +72,12 @@ const ExportButton: React.FC<ExportButtonProps> = ({
 
   const summary = getMeasurementSummary(measurements);
 
-  // Button styles based on variant and size
+  // Button styles based on size
   const buttonClasses = classNames(
     'inline-flex items-center justify-center gap-2 font-medium rounded-lg',
     'transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2',
     'disabled:opacity-50 disabled:cursor-not-allowed',
     {
-      // Variants
-      'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500':
-        variant === 'primary',
-      'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500':
-        variant === 'secondary',
-      'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500':
-        variant === 'outline',
-
       // Sizes
       'px-3 py-1.5 text-sm': size === 'sm',
       'px-4 py-2 text-base': size === 'md',
@@ -94,12 +86,49 @@ const ExportButton: React.FC<ExportButtonProps> = ({
     className
   );
 
+  // Get button style based on variant
+  const getButtonStyle = () => {
+    const baseStyle = {
+      borderWidth: variant === 'outline' ? '2px' : '0',
+    };
+
+    if (variant === 'primary') {
+      return {
+        ...baseStyle,
+        backgroundColor: 'var(--dental-primary)',
+        color: 'white',
+        borderColor: 'var(--dental-primary)',
+      };
+    }
+
+    if (variant === 'secondary') {
+      return {
+        ...baseStyle,
+        backgroundColor: 'var(--dental-secondary)',
+        color: 'white',
+        borderColor: 'var(--dental-secondary)',
+      };
+    }
+
+    if (variant === 'outline') {
+      return {
+        ...baseStyle,
+        backgroundColor: 'transparent',
+        color: 'var(--dental-primary)',
+        borderColor: 'var(--dental-primary)',
+      };
+    }
+
+    return baseStyle;
+  };
+
   return (
     <div className="relative">
       <button
         onClick={handleExport}
         disabled={isExporting || measurements.length === 0}
         className={buttonClasses}
+        style={getButtonStyle()}
         title={
           measurements.length === 0
             ? 'No measurements to export'

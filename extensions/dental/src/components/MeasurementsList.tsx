@@ -102,17 +102,40 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
   };
 
   return (
-    <div className={classNames('flex flex-col h-full bg-gray-50', className)}>
+    <div
+      className={classNames('flex flex-col h-full', className)}
+      style={{ backgroundColor: 'var(--dental-background)' }}
+    >
       {/* Header */}
-      <div className="px-4 py-3 bg-white border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800">Measurements</h3>
-        <p className="text-xs text-gray-500 mt-0.5">
+      <div
+        className="px-4 py-3 border-b"
+        style={{
+          backgroundColor: 'var(--dental-surface)',
+          borderColor: 'var(--dental-primary)'
+        }}
+      >
+        <h3
+          className="text-lg font-semibold"
+          style={{ color: 'var(--dental-text)' }}
+        >
+          Measurements
+        </h3>
+        <p
+          className="text-xs mt-0.5"
+          style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+        >
           {processedMeasurements.length} of {measurements.length} measurements
         </p>
       </div>
 
       {/* Filters and Search */}
-      <div className="p-3 bg-white border-b border-gray-200 space-y-2">
+      <div
+        className="p-3 border-b space-y-2"
+        style={{
+          backgroundColor: 'var(--dental-surface)',
+          borderColor: 'var(--dental-primary)'
+        }}
+      >
         {/* Search */}
         <div className="relative">
           <input
@@ -120,12 +143,18 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
             placeholder="Search measurements..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full px-3 py-2 pl-9 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 pl-9 text-sm border rounded-lg focus:outline-none focus:ring-2"
+            style={{
+              backgroundColor: 'var(--dental-background)',
+              borderColor: 'var(--dental-primary)',
+              color: 'var(--dental-text)'
+            }}
           />
           <svg
-            className="absolute left-3 top-2.5 w-4 h-4 text-gray-400"
+            className="absolute left-3 top-2.5 w-4 h-4"
             fill="currentColor"
             viewBox="0 0 20 20"
+            style={{ color: 'var(--dental-text)', opacity: 0.5 }}
           >
             <path
               fillRule="evenodd"
@@ -139,12 +168,13 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
         <div className="flex gap-1 overflow-x-auto pb-1">
           <button
             onClick={() => setFilterType('all')}
-            className={classNames(
-              'px-3 py-1 text-xs rounded-full whitespace-nowrap transition-colors duration-200',
-              filterType === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            )}
+            className="px-3 py-1 text-xs rounded-full whitespace-nowrap transition-colors duration-200"
+            style={{
+              backgroundColor: filterType === 'all' ? 'var(--dental-primary)' : 'var(--dental-background)',
+              color: filterType === 'all' ? 'white' : 'var(--dental-text)',
+              border: `1px solid ${filterType === 'all' ? 'var(--dental-primary)' : 'var(--dental-text)'}`,
+              opacity: filterType === 'all' ? 1 : 0.7
+            }}
           >
             All
           </button>
@@ -152,12 +182,13 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
             <button
               key={type}
               onClick={() => setFilterType(type as FilterType)}
-              className={classNames(
-                'px-3 py-1 text-xs rounded-full whitespace-nowrap transition-colors duration-200',
-                filterType === type
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              )}
+              className="px-3 py-1 text-xs rounded-full whitespace-nowrap transition-colors duration-200"
+              style={{
+                backgroundColor: filterType === type ? 'var(--dental-primary)' : 'var(--dental-background)',
+                color: filterType === type ? 'white' : 'var(--dental-text)',
+                border: `1px solid ${filterType === type ? 'var(--dental-primary)' : 'var(--dental-text)'}`,
+                opacity: filterType === type ? 1 : 0.7
+              }}
             >
               {getMeasurementTypeLabel(type).replace(' ', '\n')}
             </button>
@@ -166,17 +197,22 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
 
         {/* Sort Controls */}
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-gray-600 font-medium">Sort by:</span>
+          <span
+            className="font-medium"
+            style={{ color: 'var(--dental-text)', opacity: 0.8 }}
+          >
+            Sort by:
+          </span>
           {(['timestamp', 'type', 'value', 'tooth'] as SortBy[]).map(sort => (
             <button
               key={sort}
               onClick={() => handleSortChange(sort)}
-              className={classNames(
-                'px-2 py-1 rounded capitalize transition-colors duration-200',
-                sortBy === sort
-                  ? 'bg-blue-100 text-blue-700 font-medium'
-                  : 'text-gray-600 hover:bg-gray-200'
-              )}
+              className="px-2 py-1 rounded capitalize transition-colors duration-200"
+              style={{
+                backgroundColor: sortBy === sort ? 'var(--dental-primary)' : 'transparent',
+                color: sortBy === sort ? 'white' : 'var(--dental-text)',
+                opacity: sortBy === sort ? 1 : 0.7
+              }}
             >
               {sort}
               {sortBy === sort && (
@@ -190,12 +226,13 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
       {/* Measurements List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {processedMeasurements.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12" style={{ color: 'var(--dental-text)', opacity: 0.5 }}>
             <svg
-              className="w-16 h-16 mx-auto mb-4 text-gray-300"
+              className="w-16 h-16 mx-auto mb-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              style={{ color: 'var(--dental-text)', opacity: 0.3 }}
             >
               <path
                 strokeLinecap="round"
@@ -208,7 +245,8 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="mt-2 text-xs text-blue-600 hover:underline"
+                className="mt-2 text-xs hover:underline"
+                style={{ color: 'var(--dental-primary)' }}
               >
                 Clear search
               </button>
@@ -219,39 +257,54 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
             <div
               key={measurement.id}
               onClick={() => onMeasurementSelect?.(measurement)}
-              className={classNames(
-                'p-3 bg-white rounded-lg border-2 cursor-pointer transition-all duration-200',
-                'hover:shadow-md',
-                selectedMeasurementId === measurement.id
-                  ? 'border-blue-500 shadow-md'
-                  : 'border-gray-200 hover:border-blue-300'
-              )}
+              className="p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md"
               style={{
+                backgroundColor: 'var(--dental-surface)',
+                borderColor: selectedMeasurementId === measurement.id
+                  ? 'var(--dental-primary)'
+                  : 'var(--dental-text)',
+                borderWidth: selectedMeasurementId === measurement.id ? '2px' : '1px',
                 borderLeftWidth: '4px',
                 borderLeftColor: getMeasurementColor(measurement.type),
+                opacity: selectedMeasurementId === measurement.id ? 1 : 0.9
               }}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   {/* Label and Type */}
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-gray-900 text-sm truncate">
+                    <h4
+                      className="font-semibold text-sm truncate"
+                      style={{ color: 'var(--dental-text)' }}
+                    >
                       {measurement.label}
                     </h4>
                     {measurement.toothNumber && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                        style={{
+                          backgroundColor: 'var(--dental-primary)',
+                          color: 'white'
+                        }}
+                      >
                         {formatToothNumber(measurement.toothNumber, 'universal')}
                       </span>
                     )}
                   </div>
 
                   {/* Value */}
-                  <div className="text-lg font-bold text-gray-900">
+                  <div
+                    className="text-lg font-bold"
+                    style={{ color: 'var(--dental-text)' }}
+                  >
                     {formatMeasurementValue(measurement)}
                   </div>
 
                   {/* Metadata */}
-                  <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                  <div
+                    className="mt-1 flex items-center gap-2 text-xs"
+                    style={{ color: 'var(--dental-text)', opacity: 0.7 }}
+                  >
                     <span>{getMeasurementTypeLabel(measurement.type)}</span>
                     <span>•</span>
                     <span>{new Date(measurement.timestamp).toLocaleTimeString()}</span>
@@ -264,7 +317,16 @@ const MeasurementsList: React.FC<MeasurementsListProps> = ({
                     e.stopPropagation();
                     onMeasurementDelete?.(measurement.id);
                   }}
-                  className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-200"
+                  className="p-1 rounded transition-colors duration-200"
+                  style={{ color: 'var(--dental-text)', opacity: 0.5 }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.color = 'var(--dental-accent)';
+                    (e.currentTarget as HTMLElement).style.opacity = '1';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.color = 'var(--dental-text)';
+                    (e.currentTarget as HTMLElement).style.opacity = '0.5';
+                  }}
                   title="Delete measurement"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
