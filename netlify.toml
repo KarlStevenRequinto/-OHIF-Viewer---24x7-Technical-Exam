@@ -1,0 +1,58 @@
+# Netlify Configuration for OHIF Dental Viewer
+# This configuration tells Netlify how to build and deploy the application
+
+[build]
+  # Build command - builds the production version
+  command = "yarn build"
+
+  # Output directory - where the built files are located
+  publish = "platform/app/dist"
+
+  # Base directory (optional)
+  base = "."
+
+  # Environment variables for build
+  [build.environment]
+    NODE_VERSION = "18"
+    YARN_VERSION = "1.22.22"
+    NODE_ENV = "production"
+    # Set your API URL here (replace with your backend API URL after deploying backend)
+    VITE_API_URL = "https://your-backend-api.herokuapp.com/api"
+
+# Redirect rules for Single Page Application (SPA)
+# This ensures all routes go to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and CORS
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # CORS headers - adjust based on your needs
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+    # Security headers
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "no-referrer-when-downgrade"
+
+# Cache static assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
