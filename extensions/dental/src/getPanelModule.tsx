@@ -54,10 +54,10 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
   };
 
   return (
-    <div className="h-full overflow-y-auto" style={{ backgroundColor: 'var(--dental-background)' }}>
+    <div className="h-full" style={{ backgroundColor: 'var(--dental-background)' }}>
       {/* Measurement Tools Section */}
       <div
-        className="border-b sticky top-0 z-10"
+        className="border-b"
         style={{
           backgroundColor: 'var(--dental-background)',
           borderColor: 'var(--dental-primary)'
@@ -85,7 +85,7 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
       </div>
 
       {/* Measurements List */}
-      <div className="min-h-[200px]">
+      <div>
         <MeasurementsList
           measurements={measurements}
           selectedMeasurementId={selectedMeasurementId}
@@ -97,7 +97,7 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
       {/* Summary Footer */}
       {measurements.length > 0 && (
         <div
-          className="p-3 border-t sticky bottom-0"
+          className="p-3 border-t"
           style={{
             backgroundColor: 'var(--dental-surface)',
             borderColor: 'var(--dental-primary)'

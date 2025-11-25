@@ -219,6 +219,66 @@ const mode = {
 
     console.log('✅ Toolbar buttons registered and sections updated');
 
+    // Inject CSS to make the page scrollable
+    const injectScrollableCSS = () => {
+      const styleId = 'dental-scrollable-styles';
+      if (document.getElementById(styleId)) {
+        return; // Already injected
+      }
+
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        /* CRITICAL: Override overflow-hidden on body - this is what prevents scrolling! */
+        body {
+          overflow: visible !important;
+          overflow-y: auto !important;
+          height: auto !important;
+        }
+
+        /* Make the entire page scrollable for dental mode */
+        html, body {
+          overflow-y: auto !important;
+        }
+
+        #root {
+          height: auto !important;
+          min-height: 100vh !important;
+          overflow: visible !important;
+        }
+
+        /* Allow the main viewport grid to grow naturally */
+        .viewport-grid-container,
+        [class*="ViewportGrid"] {
+          height: auto !important;
+          min-height: 600px !important;
+        }
+
+        /* Remove height constraints from viewer layout */
+        [class*="viewer-layout"],
+        [class*="ViewerLayout"] {
+          height: auto !important;
+          min-height: 100vh !important;
+          overflow: visible !important;
+        }
+
+        /* Make sure the dental header stays at top */
+        #dental-practice-header {
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 1000 !important;
+          background-color: var(--dental-surface) !important;
+        }
+      `;
+      document.head.appendChild(style);
+      console.log('✅ Injected scrollable CSS for dental mode');
+
+      // Also remove the overflow-hidden class if already added
+      document.body.classList.remove('overflow-hidden');
+    };
+
+    injectScrollableCSS();
+
     // Apply saved theme or default dental theme
     const applySavedTheme = () => {
       try {
