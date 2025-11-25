@@ -16,8 +16,8 @@
     NODE_VERSION = "18"
     YARN_VERSION = "1.22.22"
     NODE_ENV = "production"
-    # Set your API URL here (replace with your backend API URL after deploying backend)
-    VITE_API_URL = "https://your-backend-api.herokuapp.com/api"
+    # Backend API URL from Railway
+    VITE_API_URL = "https://ohif-viewer-24x7-technical-exam-production.up.railway.app/api"
 
 # Redirect rules for Single Page Application (SPA)
 # This ensures all routes go to index.html
