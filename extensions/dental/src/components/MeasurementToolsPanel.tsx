@@ -12,23 +12,52 @@ interface MeasurementTool {
   icon: string;
   label: string;
   tooltip: string;
+  toolName?: string;
+  preset?: string; // For dental presets
 }
 
-const MEASUREMENT_TOOLS: MeasurementTool[] = [
+// DENTAL-SPECIFIC MEASUREMENT PRESETS (Task B Requirement)
+const DENTAL_PRESET_TOOLS: MeasurementTool[] = [
   {
-    id: 'Length',
+    id: 'periapical_length',
     name: 'Length',
     icon: '📏',
-    label: 'Length',
-    tooltip: 'Measure linear distance',
+    label: 'Periapical Length',
+    tooltip: 'Measure periapical length (PA length) - Uses Length tool, auto-labeled',
+    toolName: 'Length',
+    preset: 'PA Length',
   },
   {
-    id: 'Angle',
+    id: 'canal_angle',
     name: 'Angle',
     icon: '📐',
-    label: 'Angle',
-    tooltip: 'Measure angles',
+    label: 'Canal Angle',
+    tooltip: 'Measure canal angle - Uses Angle tool, auto-labeled',
+    toolName: 'Angle',
+    preset: 'Canal Angle',
   },
+  {
+    id: 'crown_width',
+    name: 'Length',
+    icon: '↔️',
+    label: 'Crown Width',
+    tooltip: 'Measure crown width - Uses Length tool, auto-labeled',
+    toolName: 'Length',
+    preset: 'Crown Width',
+  },
+  {
+    id: 'root_length',
+    name: 'Length',
+    icon: '📍',
+    label: 'Root Length',
+    tooltip: 'Measure root length - Uses Length tool, auto-labeled',
+    toolName: 'Length',
+    preset: 'Root Length',
+  },
+];
+
+// ADDITIONAL GENERAL MEASUREMENT TOOLS
+const ADDITIONAL_TOOLS: MeasurementTool[] = [
   {
     id: 'Bidirectional',
     name: 'Bidirectional',
@@ -92,11 +121,17 @@ const MeasurementToolsPanel: React.FC<Props> = ({ commandsManager }) => {
 
   const handleToolClick = (tool: MeasurementTool) => {
     try {
+      const toolName = tool.toolName || tool.name;
       commandsManager.runCommand('setToolActive', {
-        toolName: tool.name,
+        toolName: toolName,
       });
       setActiveTool(tool.id);
-      console.log(`✅ Activated tool: ${tool.name}`);
+
+      if (tool.preset) {
+        console.log(`✅ Activated DENTAL PRESET: ${tool.preset} (using ${toolName} tool)`);
+      } else {
+        console.log(`✅ Activated tool: ${toolName}`);
+      }
     } catch (error) {
       console.error(`❌ Failed to activate tool: ${tool.name}`, error);
     }
@@ -125,16 +160,17 @@ const MeasurementToolsPanel: React.FC<Props> = ({ commandsManager }) => {
 
   return (
     <div className="p-3 space-y-4" style={{ backgroundColor: 'var(--dental-background)' }}>
-      {/* Measurement Tools Section */}
+      {/* DENTAL PRESET MEASUREMENT TOOLS (Task B) */}
       <div>
         <h3
-          className="text-xs font-semibold mb-2 uppercase tracking-wide"
+          className="text-xs font-semibold mb-2 uppercase tracking-wide flex items-center gap-2"
           style={{ color: 'var(--dental-text)' }}
         >
-          📏 Measurement Tools
+          🦷 Dental Measurements
+          <span className="text-[10px] font-normal opacity-60">(One-Click Presets)</span>
         </h3>
         <div className="grid grid-cols-2 gap-2">
-          {MEASUREMENT_TOOLS.map(tool => (
+          {DENTAL_PRESET_TOOLS.map(tool => (
             <button
               key={tool.id}
               onClick={() => handleToolClick(tool)}
@@ -153,7 +189,41 @@ const MeasurementToolsPanel: React.FC<Props> = ({ commandsManager }) => {
               }}
             >
               <span className="text-2xl mb-1">{tool.icon}</span>
-              <span className="text-xs font-medium">{tool.label}</span>
+              <span className="text-xs font-medium text-center">{tool.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Additional Measurement Tools */}
+      <div>
+        <h3
+          className="text-xs font-semibold mb-2 uppercase tracking-wide"
+          style={{ color: 'var(--dental-text)' }}
+        >
+          📐 Additional Tools
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          {ADDITIONAL_TOOLS.map(tool => (
+            <button
+              key={tool.id}
+              onClick={() => handleToolClick(tool)}
+              title={tool.tooltip}
+              className={classNames(
+                'flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200',
+                'border-2 hover:scale-105 active:scale-95',
+                activeTool === tool.id
+                  ? 'border-purple-500 shadow-lg'
+                  : 'border-gray-300 hover:border-purple-400'
+              )}
+              style={{
+                backgroundColor:
+                  activeTool === tool.id ? '#8B5CF6' : 'var(--dental-surface)',
+                color: activeTool === tool.id ? 'white' : 'var(--dental-text)',
+              }}
+            >
+              <span className="text-xl mb-1">{tool.icon}</span>
+              <span className="text-[10px] font-medium text-center">{tool.label}</span>
             </button>
           ))}
         </div>
