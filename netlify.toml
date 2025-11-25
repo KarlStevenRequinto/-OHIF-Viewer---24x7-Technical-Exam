@@ -2,8 +2,8 @@
 # This configuration tells Netlify how to build and deploy the application
 
 [build]
-  # Build command - builds the production version with increased memory
-  command = "NODE_OPTIONS='--max-old-space-size=4096' yarn build"
+  # Build command - installs all deps (including dev) then builds with increased memory
+  command = "yarn install --production=false && NODE_OPTIONS='--max-old-space-size=4096' yarn build"
 
   # Output directory - where the built files are located
   publish = "platform/app/dist"
