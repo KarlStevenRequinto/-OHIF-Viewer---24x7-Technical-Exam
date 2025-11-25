@@ -7,6 +7,7 @@ import React from 'react';
 import MeasurementsList from './components/MeasurementsList';
 import ExportButton from './components/ExportButton';
 import DentalPracticeHeader from './components/DentalPracticeHeader';
+import MeasurementToolsPanel from './components/MeasurementToolsPanel';
 import { useDentalStore } from './stores/useDentalStore';
 
 /**
@@ -53,8 +54,19 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--dental-background)' }}>
-      {/* Export Button at the Top */}
+    <div className="h-full overflow-y-auto" style={{ backgroundColor: 'var(--dental-background)' }}>
+      {/* Measurement Tools Section */}
+      <div
+        className="border-b sticky top-0 z-10"
+        style={{
+          backgroundColor: 'var(--dental-background)',
+          borderColor: 'var(--dental-primary)'
+        }}
+      >
+        <MeasurementToolsPanel commandsManager={commandsManager} />
+      </div>
+
+      {/* Export Button */}
       <div
         className="p-3 border-b"
         style={{
@@ -73,7 +85,7 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
       </div>
 
       {/* Measurements List */}
-      <div className="flex-1 overflow-hidden">
+      <div className="min-h-[200px]">
         <MeasurementsList
           measurements={measurements}
           selectedMeasurementId={selectedMeasurementId}
@@ -85,7 +97,7 @@ const DentalMeasurementsPanel = ({ servicesManager, commandsManager }) => {
       {/* Summary Footer */}
       {measurements.length > 0 && (
         <div
-          className="p-3 border-t"
+          className="p-3 border-t sticky bottom-0"
           style={{
             backgroundColor: 'var(--dental-surface)',
             borderColor: 'var(--dental-primary)'

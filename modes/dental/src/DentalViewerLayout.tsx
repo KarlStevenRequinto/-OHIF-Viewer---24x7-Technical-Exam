@@ -58,9 +58,9 @@ function DentalViewerLayout({
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col" style={{ minHeight: '100vh' }}>
       {/* Dental Practice Header - replaces standard OHIF header */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 sticky top-0 z-50" style={{ backgroundColor: 'var(--dental-surface)' }}>
         <DentalPracticeHeader
           practiceInfo={practiceInfo}
           patientInfo={patientInfo}
@@ -72,7 +72,7 @@ function DentalViewerLayout({
       </div>
 
       {/* Main content area - render children */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col">
         {children}
       </div>
     </div>
