@@ -15,7 +15,6 @@
   [build.environment]
     NODE_VERSION = "18"
     YARN_VERSION = "1.22.22"
-    NODE_ENV = "production"
     # Backend API URL from Railway
     VITE_API_URL = "https://ohif-viewer-24x7-technical-exam-production.up.railway.app/api"
 
